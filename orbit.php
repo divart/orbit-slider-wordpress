@@ -111,7 +111,7 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 
 		echo '<div class="orbit" role="region"' .
 			(isset($orbitaria) ? ' aria-label="' . $orbitaria . '"' : '' ) .
-			' data-orbit' . (isset($orbitparam) ? '" data-options="' . $orbitparam . '"' : '' ) .
+			' data-orbit' . (isset($orbitparam) ? ' data-options="' . $orbitparam . '"' : '' ) .
 			(isset($motionui) ? ' data-use-m-u-i="true"' : ' data-use-m-u-i="false"' ) .'>';
 
 		?>
@@ -124,21 +124,15 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 
 				if(has_post_thumbnail()) {
 
-					if($orbitsize != '') {
-						$orbitimagethumbnail = wp_get_attachment_image_src( get_post_thumbnail_id(), $orbitsize);
-						$orbitimage = $orbitimagethumbnail['0'];
+					echo '<li class="' . ($loop->current_post == 0 && !is_paged() ? 'is-active ' : '' ) . 'orbit-slide">';
+					if(isset($orbitlink)) {echo '<a href="' . $orbitlink . '">';}
+					if(isset($orbitsize)) {
+						the_post_thumbnail($orbitsize, array('class' => 'orbit-image'));
 					} else {
-						$orbitimagefull = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'thumbnail_size');
-						$orbitimage = $orbitimagefull['0'];
+						the_post_thumbnail('full', array('class' => 'orbit-image'));
 					}
-					$orbitimagealttext = get_post_meta(get_post_thumbnail_id($post->ID), '_wp_attachment_image_alt', true);
-					$orbitcaption = get_post_meta(get_the_ID(), '_orbit_meta_box_caption_text', true );
-					$orbitlink = get_post_meta(get_the_ID(), '_orbit_meta_box_link_text', true );
-					echo '<li class="' . ($wp_query->current_post == 0 && !is_paged() ? 'is-active ' : '' ) . 'orbit-slide">';
-					if($orbitlink != '') {echo '<a href="' . $orbitlink . '">';}
-					echo '<img class="orbit-image" src="'. $orbitimage . '" alt="' . $orbitimagealttext . '"/>';
-					if($orbitcaption != '') {echo '<figcaption class="orbit-caption">' . $orbitcaption . '</figcaption>';}
-					if($orbitlink != '') {echo '</a>';}
+					if(isset($orbitcaption)) {echo '<figcaption class="orbit-caption">' . $orbitcaption . '</figcaption>';}
+					if(isset($orbitlink)) {echo '</a>';}
 					echo '</li>';
 
 				} else {
@@ -152,6 +146,7 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 				}
 
 			endwhile;
+			wp_reset_query();
 
 		echo '</ul>';
 		/*?> <nav class="orbit-bullets"> <?php
