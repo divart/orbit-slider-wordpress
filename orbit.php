@@ -119,20 +119,22 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 		<button class="orbit-previous" aria-label="<?php _e('previous','cornerstone'); ?>"><span class="show-for-sr"><?php _e('Previous Slide','cornerstone'); ?></span>&#10094;</button>
     	<button class="orbit-next" aria-label="<?php _e('next','cornerstone'); ?>"><span class="show-for-sr"><?php _e('Next Slide','cornerstone'); ?></span>&#10095;</button>
     	<?php
-
+    		global $post;
 			while ( $loop->have_posts() ) : $loop->the_post();
 
 				if(has_post_thumbnail()) {
 
 					echo '<li class="' . ($loop->current_post == 0 && !is_paged() ? 'is-active ' : '' ) . 'orbit-slide">';
-					if(isset($orbitlink)) {echo '<a href="' . $orbitlink . '">';}
+					$orbitlink = get_post_meta( $post->ID, '_orbit_meta_box_link_text', true );
+					if(!empty($orbitlink)) {echo '<a href="' . $orbitlink . '">';}
 					if(isset($orbitsize)) {
 						the_post_thumbnail($orbitsize, array('class' => 'orbit-image'));
 					} else {
 						the_post_thumbnail('full', array('class' => 'orbit-image'));
 					}
-					if(isset($orbitcaption)) {echo '<figcaption class="orbit-caption">' . $orbitcaption . '</figcaption>';}
-					if(isset($orbitlink)) {echo '</a>';}
+					$orbitcaption = get_post_meta( $post->ID, '_orbit_meta_box_caption_text', true );
+					if(!empty($orbitcaption)) {echo '<figcaption class="orbit-caption">' . $orbitcaption . '</figcaption>';}
+					if(!empty($orbitlink)) {echo '</a>';}
 					echo '</li>';
 
 				} else {
