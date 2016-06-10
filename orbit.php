@@ -3,7 +3,7 @@
   Plugin Name: Orbit Slider
   Description: A plugin to include the Orbit Slider from Zurb Foundation 6 in your theme.
   Author: Stephen Mullen
-  Version: 1.0
+  Version: 1.1
   Author URI: http://www.thewirelessguy.co.uk
   Licence: GPL2
  */
@@ -101,12 +101,16 @@ if ( ! function_exists( 'orbit_meta_box_save' ) ) {
  * Display Orbit Slider
  * Simple: <?php OrbitSlider(); ?>
  * Advanced: <?php OrbitSlider($orbitparam, $orbitsize); ?>
- * Advanced example: <?php OrbitSlider("slide_number: false; bullets: false", "large", "Aria label"); ?>
+ * Advanced example: <?php OrbitSlider("animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;", "large", "Aria label"); ?>
  */
 if ( ! function_exists( 'OrbitSlider' ) ) {
 	function OrbitSlider($orbitparam = null, $orbitsize = null, $orbitaria = null, $motionui = null) {
 
-		$args = array( 'post_type' => 'Orbit');
+		$args = array(
+			'post_type' => 'Orbit',
+			'no_found_rows' => true, // Optimize query for no paging
+			'update_post_term_cache' => false, // grabs terms, remove if terms required (category, tag...)
+			);
 		$loop = new WP_Query( $args );
 
 		echo '<div class="orbit" role="region"' .
@@ -159,3 +163,20 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 		echo '</div>';
 	}
 }
+
+/**
+ * Orbit shortcode
+ * Example usage: [orbitslider orbitparam="animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;" orbitsize="medium" orbitaria="Orbit image slider" motionui=true]
+ */
+function orbitslider_shortcode( $atts ) {
+	extract( shortcode_atts(
+		array(
+			'orbitparam' => null,
+			'orbitsize' => null,
+			'orbitaria' => null,
+			'motionui' => null
+		), $atts )
+	);
+	return OrbitSlider($atts['orbitparam'], $atts['orbitsize'], $atts['orbitaria'], $atts['motionui']);
+}
+add_shortcode( 'orbitslider', 'orbitslider_shortcode' );
