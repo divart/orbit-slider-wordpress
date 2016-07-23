@@ -101,7 +101,7 @@ if ( ! function_exists( 'orbit_meta_box_save' ) ) {
  * Display Orbit Slider
  * Simple: <?php OrbitSlider(); ?>
  * Advanced: <?php OrbitSlider($orbitparam, $orbitsize); ?>
- * Advanced example: <?php OrbitSlider("animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;", "large", "Aria label"); ?>
+ * Advanced example: <?php OrbitSlider("animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;", "large", "Aria label", true); ?>
  */
 if ( ! function_exists( 'OrbitSlider' ) ) {
 	function OrbitSlider($orbitparam = null, $orbitsize = null, $orbitaria = null, $motionui = null) {
