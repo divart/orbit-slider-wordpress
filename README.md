@@ -6,7 +6,7 @@ Adds Orbit Slider support to WordPress themes based on Foundation 6.
 ## Usage
 
 ```
-OrbitSlider($orbitparam = null, $orbitsize = null, $orbitaria = null, $motionui = null)
+OrbitSlider($orbitparam = null, $orbitsize = null, $orbitaria = null, $motionui = null, $bullets = null, $post_type = null, $posts_per_page = null, $hide_title = null)
 ```
 
 ### Parameters
