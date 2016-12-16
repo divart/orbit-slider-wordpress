@@ -25,7 +25,22 @@ Default value: null
 
 **$motionui**  
 (Boolean) (Optional) Use MotionUI  
-Default value: null
+Default value: false
+
+**$bullets**  
+(Boolean) (Optional) Use Bullets  
+Default value: false
+
+**$post_type**  
+Default value: 'orbit'
+
+**$posts_per_page**  
+(String) (Optional) Number of post to display  
+Default value: '-1'
+
+$hide_title
+(Boolean) (Optional) Hide title  
+Default value: false
 
 ### Examples
 
@@ -38,6 +53,13 @@ OrbitSlider(null, "orbit", null, true);  // Orbit Slider with custom image size 
 ```
 OrbitSlider("animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;", "large", "Orbit Slider", true);  // Orbit Slider with custom transitions, large image size and uses MotionUI. ARIA label set as 'Orbit Slider'
 ```
+
+## Added support for other WordPress plugins
+
+**[WP Rocket](https://wp-rocket.me) and [Rocket Lazy Load](https://wordpress.org/plugins-wp/rocket-lazy-load/)**
+
+The plugin deactivates Lazy Load on Orbit Slider images so you can safely enable Lazy Load on your website without it breaking the slider.
+
 
 ## Download
 
