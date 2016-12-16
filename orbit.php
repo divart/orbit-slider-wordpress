@@ -3,8 +3,8 @@
   Plugin Name: Orbit Slider
   Description: A plugin to include the Orbit Slider from Zurb Foundation 6 in your theme.
   Author: Stephen Mullen
-  Version: 1.1
-  Author URI: http://www.thewirelessguy.co.uk
+  Version: 1.2
+  Author URI: https://www.thewirelessguy.co.uk
   Licence: GPL2
  */
 
@@ -37,7 +37,7 @@ if ( ! function_exists( 'Orbit' ) ) {
 			'supports'	=>	array('title', 'editor','page-attributes','thumbnail','custom-fields'),
 			'taxonomies' => array('category','post_tag')
 			);
-			register_post_type('Orbit', $Orbit_args);
+			register_post_type('orbit', $Orbit_args);
 	}
 }
 
@@ -104,10 +104,11 @@ if ( ! function_exists( 'orbit_meta_box_save' ) ) {
  * Advanced example: <?php OrbitSlider("animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;", "large", "Aria label", true); ?>
  */
 if ( ! function_exists( 'OrbitSlider' ) ) {
-	function OrbitSlider($orbitparam = null, $orbitsize = null, $orbitaria = null, $motionui = null) {
+	function OrbitSlider($orbitparam = null, $orbitsize = null, $orbitaria = null, $motionui = null, $bullets = null, $post_type = null, $posts_per_page = null, $hide_title = null) {
 
 		$args = array(
-			'post_type' => 'Orbit',
+			'post_type' => (isset($post_type) ? $post_type : 'orbit'),
+			'posts_per_page' => (isset($posts_per_page) ? $posts_per_page : '-1'),
 			'no_found_rows' => true, // Optimize query for no paging
 			'update_post_term_cache' => false, // grabs terms, remove if terms required (category, tag...)
 			);
@@ -120,8 +121,8 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 
 		?>
 		<ul class="orbit-container">
-		<button class="orbit-previous" aria-label="<?php _e('previous','cornerstone'); ?>"><span class="show-for-sr"><?php _e('Previous Slide','cornerstone'); ?></span>&#10094;</button>
-    	<button class="orbit-next" aria-label="<?php _e('next','cornerstone'); ?>"><span class="show-for-sr"><?php _e('Next Slide','cornerstone'); ?></span>&#10095;</button>
+		<li><button class="orbit-previous" aria-label="<?php _e('previous','cornerstone'); ?>"><span class="show-for-sr"><?php _e('Previous Slide','cornerstone'); ?></span>&#10094;</button></li>
+    	<li><button class="orbit-next" aria-label="<?php _e('next','cornerstone'); ?>"><span class="show-for-sr"><?php _e('Next Slide','cornerstone'); ?></span>&#10095;</button></li>
     	<?php
     		global $post;
 			while ( $loop->have_posts() ) : $loop->the_post();
@@ -132,9 +133,9 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 					$orbitlink = get_post_meta( $post->ID, '_orbit_meta_box_link_text', true );
 					if(!empty($orbitlink)) {echo '<a href="' . $orbitlink . '">';}
 					if(isset($orbitsize)) {
-						the_post_thumbnail($orbitsize, array('class' => 'orbit-image'));
+						the_post_thumbnail($orbitsize, array('class' => 'orbit-image', 'data-no-lazy' => '1'));
 					} else {
-						the_post_thumbnail('full', array('class' => 'orbit-image'));
+						the_post_thumbnail('full', array('class' => 'orbit-image', 'data-no-lazy' => '1'));
 					}
 					$orbitcaption = get_post_meta( $post->ID, '_orbit_meta_box_caption_text', true );
 					if(!empty($orbitcaption)) {echo '<figcaption class="orbit-caption">' . $orbitcaption . '</figcaption>';}
@@ -143,23 +144,25 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
 
 				} else {
 
-					echo '<li class="orbit-slide"><h3>';
-					the_title();
-					echo '</h3>';
+					echo '<li class="orbit-slide">';
+					echo ($hide_title ? '' : '<h3>' . get_the_title() . '</h3>');
 					the_content();
 					echo '</li>';
 
 				}
 
 			endwhile;
-			wp_reset_query();
 
 		echo '</ul>';
-		/*?> <nav class="orbit-bullets"> <?php
-		while ( $loop->have_posts() ) : $loop->the_post();
-		   echo '<button class="' . ($wp_query->current_post == 0 && !is_paged() ? 'is-active ' : '' ) . '" data-slide="' . $wp_query->current_post .'"><span class="show-for-sr">slide' . $wp_query->current_post . 'details.</span></button>';
-		   endwhile;
-		 ?></nav> <?php*/
+		if($bullets == 'true') {
+			rewind_posts();
+			echo '<nav class="orbit-bullets">';
+				while ( $loop->have_posts() ) : $loop->the_post();
+					echo '<button class="' . ($loop->current_post == 0 && !is_paged() ? 'is-active ' : '' ) . '" data-slide="' . $loop->current_post .'"><span class="show-for-sr">slide' . $loop->current_post . 'details.</span></button>';
+				endwhile; // End the loop
+			echo '</nav>';
+		}
+		wp_reset_query();
 		echo '</div>';
 	}
 }
@@ -169,14 +172,22 @@ if ( ! function_exists( 'OrbitSlider' ) ) {
  * Example usage: [orbitslider orbitparam="animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;" orbitsize="medium" orbitaria="Orbit image slider" motionui=true]
  */
 function orbitslider_shortcode( $atts ) {
-	extract( shortcode_atts(
+	$args = shortcode_atts(
 		array(
 			'orbitparam' => null,
 			'orbitsize' => null,
 			'orbitaria' => null,
-			'motionui' => null
-		), $atts )
+			'motionui' => 'false',
+			'bullets' => 'false',
+			'post_type' => null,
+			'posts_per_page' => null,
+			'hide_title' => 'false'
+		), $atts,
+		'orbitslider'
 	);
-	return OrbitSlider($atts['orbitparam'], $atts['orbitsize'], $atts['orbitaria'], $atts['motionui']);
+	$args['motionui'] = filter_var( $args['motionui'], FILTER_VALIDATE_BOOLEAN );
+	$args['bullets'] = filter_var( $args['bullets'], FILTER_VALIDATE_BOOLEAN );
+	$args['hide_title'] = filter_var( $args['hide_title'], FILTER_VALIDATE_BOOLEAN );
+	return OrbitSlider($atts['orbitparam'], $atts['orbitsize'], $atts['orbitaria'], $atts['motionui'], $atts['bullets'], $atts['post_type'], $atts['posts_per_page'], $atts['hide_title']);
 }
 add_shortcode( 'orbitslider', 'orbitslider_shortcode' );
